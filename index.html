@@ -37,7 +37,7 @@ async function getAIAdvice() {
 
     const apiKey = "AIzaSyDG_b0XmwodWqhc-jsobOZIA3_VCVIoPJg";
     // 修正後的網址行
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const payload = {
         contents: [{ parts: [{ text: `我是一名滑雪者，戰力得分是 ${score}。請以 TAS 品牌專家的口吻，給我一段 100 字內的裝備建議。` }] }]
