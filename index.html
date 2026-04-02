@@ -8,7 +8,7 @@
         body { font-family: sans-serif; background: #000; color: #fff; text-align: center; padding: 50px; }
         .card { background: #1a1a1a; padding: 30px; border-radius: 20px; max-width: 500px; margin: auto; box-shadow: 0 0 20px rgba(255,255,255,0.1); }
         button { background: #fff; color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        #result { margin-top: 30px; line-height: 1.6; color: #ccc; }
+        #result { margin-top: 30px; line-height: 1.6; color: #ccc; white-space: pre-wrap; }
     </style>
 </head>
 <body>
@@ -16,7 +16,7 @@
 <div class="card">
     <h2>🎿 TAS 滑雪戰力檢測</h2>
     <p>請輸入你的滑雪得分 (1-100)：</p>
-    <input type="number" id="scoreInput" style="padding:10px; border-radius:5px; width:80%;">
+    <input type="number" id="scoreInput" placeholder="例如: 75" style="padding:10px; border-radius:5px; width:80%;">
     <br>
     <button onclick="getAIAdvice()">解鎖 AI 處方箋</button>
     
@@ -27,10 +27,17 @@
 async function getAIAdvice() {
     const score = document.getElementById('scoreInput').value;
     const resultDiv = document.getElementById('result');
+
+    if (!score) {
+        alert("請輸入分數喔！");
+        return;
+    }
+
     resultDiv.innerText = "AI 正在分析你的戰力...";
 
     const apiKey = "AIzaSyDG_b0XmwodWqhc-jsobOZIA3_VCVIoPJg";
-    const url = `const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // 修正後的網址行
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const payload = {
         contents: [{ parts: [{ text: `我是一名滑雪者，戰力得分是 ${score}。請以 TAS 品牌專家的口吻，給我一段 100 字內的裝備建議。` }] }]
@@ -42,11 +49,25 @@ async function getAIAdvice() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
+
         const data = await response.json();
-        const advice = data.candidates[0].content.parts[0].text;
-        resultDiv.innerText = advice;
+
+        // 檢查 API 是否回傳錯誤訊息
+        if (data.error) {
+            resultDiv.innerText = "API 報錯了: " + data.error.message;
+            return;
+        }
+
+        // 檢查是否有生成內容
+        if (data.candidates && data.candidates.length > 0) {
+            const advice = data.candidates[0].content.parts[0].text;
+            resultDiv.innerText = advice;
+        } else {
+            resultDiv.innerText = "AI 沒給出建議，請再試一次。";
+        }
     } catch (e) {
-        resultDiv.innerText = "連線失敗，請檢查 API Key 或網路。";
+        console.error(e);
+        resultDiv.innerText = "連線失敗，請檢查網路或 API Key。";
     }
 }
 </script>
